@@ -70,10 +70,10 @@ function drawScene() {
     //iterate all objects
     draw_objects(0);
     draw_objects(1);
-    //draw_objects(2);
-    //draw_objects(3);
-    //draw_objects(4);
-    //draw_objects(5);
+    draw_objects(2);
+    draw_objects(3);
+    draw_objects(4);
+    draw_objects(5);
 }
 
 function setMatrixUniforms() {

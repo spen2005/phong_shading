@@ -8,7 +8,7 @@
 <script type="text/javascript" src="./js/webgl-utils.js"></script>
 <script type="text/javascript" src="./js/phong_shader.js"></script>
 <script type="text/javascript" src="./js/interactive_function.js"></script>
-<script type="text/javascript" src="./js/json_loader.js"></script>
+<script type="text/javascript" src="./js/obj_loader.js"></script>
 <script type="text/javascript" src="./js/draw_obj.js"></script>
 <script type="text/javascript" src="./js/animation.js"></script>
 
@@ -109,7 +109,7 @@
     var cameraDirection = vec3.create([0, 0, -1]); // Initial camera direction
     var cameraUp = vec3.create([0, 1, 0]);
     //alert(cameraDirection);
-    var cameraSpeed = 1; // Adjust as needed
+    //var cameraSpeed = 1; // Adjust as needed
 
 
     //VertexPositionBuffer array
@@ -122,7 +122,7 @@
     const angle = new Array(20);
     //scale array
     const obj_scale = [];
-    obj_scale.push(100.0); //tomcat
+    obj_scale.push(10.0); //tomcat
     obj_scale.push(100.0); //csie
     obj_scale.push(20.0); //kangaroo
     obj_scale.push(1.0); //teapot
@@ -130,15 +130,15 @@
     obj_scale.push(0.5); //church
     //translate array
     const obj_translate = []
-    obj_translate.push(vec3.create([-3,0,0])); //tomcat
-    obj_translate.push(vec3.create([-0.1,0,-0.5])); //csie
+    obj_translate.push(vec3.create([50,0,0])); //tomcat
+    obj_translate.push(vec3.create([0,0,0])); //csie
     obj_translate.push(vec3.create([10,0,-10])); //kangaroo
     obj_translate.push(vec3.create([-20,0,-10])); //teapot
     obj_translate.push(vec3.create([35,0,-5])); //car
     obj_translate.push(vec3.create([0,0,-10])); //church
     //rotate array
     const obj_rotate = []
-    obj_rotate.push(vec3.create([-90,0,0])); //tomcat
+    obj_rotate.push(vec3.create([0,0,0])); //tomcat
     obj_rotate.push(vec3.create([-90,0,0])); //csie
     obj_rotate.push(vec3.create([0,0,0])); //kangaroo
     obj_rotate.push(vec3.create([0,0,0])); //teapot
@@ -189,11 +189,15 @@
         var canvas = document.getElementById("ICG-canvas");
         initGL(canvas);
         initShaders();
-        //load_obj("Teapot.json", 0);
-        load_obj("Mercedes.json", 0);
+        load_obj("Teapot.json", 0,0);
+        load_obj("Car_road.json", 1,0);
+        load_obj("Csie.json", 2,0);
+        load_obj("soccer.obj", 3,1);
+        load_obj("cube.obj", 4,1);
+        //load_obj("Mercedes.json", 0,0);
         //load_obj("Csie.json", 0);
         //load_obj("diy.json", 0);
-        load_obj("Csie.json", 1);
+        
         //load_obj("diy.json", 2);
         //load_obj("pinkball.json", 2);
         //load_obj("Kangaroo.json", 2);
@@ -204,7 +208,7 @@
         //loadCSIEbuilding();
 
         document.addEventListener('keydown', function(event) {
-            moveSpeed = 3;
+            moveSpeed = 8;
             switch(event.key) {
                 case 'w':
                     //alert("w");
