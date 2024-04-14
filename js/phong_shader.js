@@ -59,7 +59,7 @@ function initShaders() {
     gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
     
     gl.uniform1f(gl.getUniformLocation(shaderProgram, "Ka"), ka); // 
-    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "lightLoc"), light_locations);
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "lightLoc"), [10.0,10.0,10.0]);
     shaderProgram.projectionUniform  = gl.getUniformLocation(shaderProgram, "projection");
     shaderProgram.modelUniform = gl.getUniformLocation(shaderProgram, "model");
     shaderProgram.viewUniform = gl.getUniformLocation(shaderProgram, "view");

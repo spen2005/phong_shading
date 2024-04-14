@@ -34,22 +34,49 @@ function parse_obj(responseText, color) {
         } else if (parts[0] === "vn") {
             normals.push(parseFloat(parts[1]), parseFloat(parts[2]), parseFloat(parts[3]));
         } else if (parts[0] === "f") {
+            //2 triangles 0 1 2 0 2 3
             parts.shift(); // Remove "f"
-            parts.forEach(function (vertex) {
-                var vertexData = vertex.split("//");
-                var vertexIndex = parseInt(vertexData[0]) - 1; 
-                var normalIndex = parseInt(vertexData[1]) - 1; 
+            var vertexIndex = [];
+            var normalIndex = [];
 
-                vertexIndices.push(positions[vertexIndex * 3], positions[vertexIndex * 3 + 1], positions[vertexIndex * 3 + 2]);
-                normalIndices.push(normals[normalIndex * 3], normals[normalIndex * 3 + 1], normals[normalIndex * 3 + 2]);
+            //2 triangles 0 1 2 0 2 3
+            parts.forEach(function (part) {
+                var indices = part.split("/");
+                vertexIndex.push(parseInt(indices[0]) - 1);
+                normalIndex.push(parseInt(indices[2]) - 1);
+            }
+            );
+            //alert("vertexIndex: " + vertexIndex[0] + " " + vertexIndex[1] + " " + vertexIndex[2] + " " + vertexIndex[3]);
+            vertexIndices.push(positions[vertexIndex[0] * 3], positions[vertexIndex[0] * 3 + 1], positions[vertexIndex[0] * 3 + 2]);
+            vertexIndices.push(positions[vertexIndex[1] * 3], positions[vertexIndex[1] * 3 + 1], positions[vertexIndex[1] * 3 + 2]);
+            vertexIndices.push(positions[vertexIndex[2] * 3], positions[vertexIndex[2] * 3 + 1], positions[vertexIndex[2] * 3 + 2]);
+
+            normalIndices.push(normals[normalIndex[0] * 3], normals[normalIndex[0] * 3 + 1], normals[normalIndex[0] * 3 + 2]);
+            normalIndices.push(normals[normalIndex[1] * 3], normals[normalIndex[1] * 3 + 1], normals[normalIndex[1] * 3 + 2]);
+            normalIndices.push(normals[normalIndex[2] * 3], normals[normalIndex[2] * 3 + 1], normals[normalIndex[2] * 3 + 2]);
+
+            ct++;
+
+            if (vertexIndex.length > 3) {
+                //alert("extra");
+                vertexIndices.push(positions[vertexIndex[0] * 3], positions[vertexIndex[0] * 3 + 1], positions[vertexIndex[0] * 3 + 2]);
+                vertexIndices.push(positions[vertexIndex[2] * 3], positions[vertexIndex[2] * 3 + 1], positions[vertexIndex[2] * 3 + 2]);
+                vertexIndices.push(positions[vertexIndex[3] * 3], positions[vertexIndex[3] * 3 + 1], positions[vertexIndex[3] * 3 + 2]);
+
+                normalIndices.push(normals[normalIndex[0] * 3], normals[normalIndex[0] * 3 + 1], normals[normalIndex[0] * 3 + 2]);
+                normalIndices.push(normals[normalIndex[2] * 3], normals[normalIndex[2] * 3 + 1], normals[normalIndex[2] * 3 + 2]);
+                normalIndices.push(normals[normalIndex[3] * 3], normals[normalIndex[3] * 3 + 1], normals[normalIndex[3] * 3 + 2]);
+
                 ct++;
-            });
+            }
         }        
     });
 
-    for (var i = 0; i < 3*ct; i += 3) {
+    //alert("ct: " + ct);
+    for (var i = 0; i < 9*ct; i += 3) {
         colors.push(color[0], color[1], color[2]);
     }
+    alert("colorsize: " + colors.length + " vertexIndices: " + vertexIndices.length + " normalIndices: " + normalIndices.length);
 
     var Data = {
         vertexPositions: new Float32Array(vertexIndices),
@@ -67,7 +94,7 @@ function load_obj(filename, i, obj_type) {
     request.onreadystatechange = function () {
         if (request.readyState == 4) {
             if(obj_type == 0 )handle_loaded_obj(JSON.parse(request.responseText), i);
-            else if(obj_type == 1) handle_loaded_obj(parse_obj(request.responseText,[0.628281,0.555802,0.366065]), i);
+            else if(obj_type == 1) handle_loaded_obj(parse_obj(request.responseText,[212/255,175/255,55/255]), i);
         }
     }
     request.send();

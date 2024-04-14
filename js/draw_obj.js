@@ -40,26 +40,31 @@ function draw_objects(i){
     mat4.lookAt(cameraPosition, temp, cameraUp,view);
     setMatrixUniforms();
 
+    //alert("VertexPositionBuffer[i].numItems: " + VertexPositionBuffer[i].numItems);
     gl.bindBuffer(gl.ARRAY_BUFFER, VertexPositionBuffer[i]);
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, VertexPositionBuffer[i].itemSize, gl.FLOAT, false,  0, 0);
-
+    
+    //alert("VertexFrontColorBuffer[i].numItems: " + VertexFrontColorBuffer[i].numItems);
     // Setup front color data
     gl.bindBuffer(gl.ARRAY_BUFFER, VertexFrontColorBuffer[i]);
     gl.vertexAttribPointer(shaderProgram.vertexFrontColorAttribute,VertexFrontColorBuffer[i].itemSize, gl.FLOAT, false, 0, 0);
     
+    //alert("VertexNormalBuffer[i].numItems: " + VertexNormalBuffer[i].numItems);
     // Setup normal data
     gl.bindBuffer(gl.ARRAY_BUFFER, VertexNormalBuffer[i]);
     gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, VertexNormalBuffer[i].itemSize, gl.FLOAT, false, 0, 0);
 
     // Setup ambient light and light position
     gl.uniform1f(gl.getUniformLocation(shaderProgram, "Ka"), ka);
-    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "lightLoc"), light_locations);
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "lightLoc"), [10.0,10.0,10.0]);
 
     //Setup material
     gl.uniform1f(gl.getUniformLocation(shaderProgram, "Kd"), obj_mtl[i][1]);
     gl.uniform1f(gl.getUniformLocation(shaderProgram, "Ks"), obj_mtl[i][2]);
 
+    //alert("VertexPositionBuffer[i].numItems: " + VertexPositionBuffer[i].numItems);
     gl.drawArrays(gl.TRIANGLES, 0, VertexPositionBuffer[i].numItems);
+
 }
    
 
