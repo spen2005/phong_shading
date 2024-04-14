@@ -9,8 +9,8 @@ function draw_objects(i){
     mat4.identity(model);
 
     //scale
-    mat4.scale(model, [obj_scale[i], obj_scale[i], obj_scale[i]]);
-    var rotateVec_init = obj_rotate[i];
+    mat4.scale(model, [objects[i].scale, objects[i].scale, objects[i].scale]);
+    var rotateVec_init = objects[i].rotation; 
     mat4.rotate(model, degToRad(rotateVec_init[0]), [1, 0, 0]);
     mat4.rotate(model, degToRad(rotateVec_init[1]), [0, 1, 0]);
     mat4.rotate(model, degToRad(rotateVec_init[2]), [0, 0, 1]);
@@ -18,7 +18,7 @@ function draw_objects(i){
 
     //alert(model);
     //translate
-    var translateVec = obj_translate[i];
+    var translateVec = objects[i].position;
     mat4.translate(model, translateVec);
     
 
@@ -59,8 +59,8 @@ function draw_objects(i){
     gl.uniform3fv(gl.getUniformLocation(shaderProgram, "lightLoc"), [10.0,10.0,10.0]);
 
     //Setup material
-    gl.uniform1f(gl.getUniformLocation(shaderProgram, "Kd"), obj_mtl[i][1]);
-    gl.uniform1f(gl.getUniformLocation(shaderProgram, "Ks"), obj_mtl[i][2]);
+    gl.uniform1f(gl.getUniformLocation(shaderProgram, "Kd"), objects[i].material[1]);
+    gl.uniform1f(gl.getUniformLocation(shaderProgram, "Ks"), objects[i].material[2]);
 
     //alert("VertexPositionBuffer[i].numItems: " + VertexPositionBuffer[i].numItems);
     gl.drawArrays(gl.TRIANGLES, 0, VertexPositionBuffer[i].numItems);
