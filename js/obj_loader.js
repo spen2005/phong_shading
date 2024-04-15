@@ -76,7 +76,7 @@ function parse_obj(responseText, color) {
     for (var i = 0; i < 9*ct; i += 3) {
         colors.push(color[0], color[1], color[2]);
     }
-    alert("colorsize: " + colors.length + " vertexIndices: " + vertexIndices.length + " normalIndices: " + normalIndices.length);
+    //alert("colorsize: " + colors.length + " vertexIndices: " + vertexIndices.length + " normalIndices: " + normalIndices.length);
 
     var Data = {
         vertexPositions: new Float32Array(vertexIndices),
@@ -94,7 +94,10 @@ function load_obj(filename, i, obj_type) {
     request.onreadystatechange = function () {
         if (request.readyState == 4) {
             if(obj_type == 0 )handle_loaded_obj(JSON.parse(request.responseText), i);
-            else if(obj_type == 1) handle_loaded_obj(parse_obj(request.responseText,[212/255,175/255,55/255]), i);
+            else if(obj_type == 1){
+                handle_loaded_obj(parse_obj(request.responseText,[objects[i].color[0],objects[i].color[1],objects[i].color[2]]), i);
+                
+            }
         }
     }
     request.send();
