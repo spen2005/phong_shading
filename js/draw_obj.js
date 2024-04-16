@@ -58,7 +58,7 @@ function draw_objects(i){
 
     // Setup ambient light and light position
     gl.uniform1f(gl.getUniformLocation(shaderProgram, "Ka"), ka);
-    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "lightLoc"), [0.0,5.0,0.0]);
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "lightLoc"), [0.0,0.0,0.0]);
 
     //Setup material
     gl.uniform1f(gl.getUniformLocation(shaderProgram, "Kd"), objects[i].material[1]);
@@ -81,7 +81,7 @@ function drawScene() {
     draw_objects(3);
     draw_objects(4);
     draw_objects(5);
-    draw_objects(6);
+    //draw_objects(6);
     draw_objects(7);
     animate();
 }

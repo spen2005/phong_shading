@@ -134,14 +134,14 @@
     }
 
     var objects = [
-        createObject(1, vec3.create([-4, 0, -1]), vec3.create([0, 0, 0]), vec3.create([2, 0, 3]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.1, 0.5, 0.9])),
-        createObject(1, vec3.create([-2, 0, 5]), vec3.create([0, 0, 0]), vec3.create([1, 0, -1]), vec3.create([0.1, 0.3, 0.8]), vec3.create([0.6, 0.3, 0.8])),
-        createObject(1, vec3.create([-1, 0, -3]), vec3.create([0, 0, 0]), vec3.create([-1, 0, 3]), vec3.create([0.1, 0.8, 0.3]), vec3.create([0.8, 0.1, 0.1])),
-        createObject(1, vec3.create([3, 0, 7]), vec3.create([0, 0, 0]), vec3.create([4, 0, -2]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.9, 0.1, 0.5])),
-        createObject(1, vec3.create([6, 0, -8]), vec3.create([0, 0, 0]), vec3.create([-3, 0, 1]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.3, 0.7, 0.1])),
-        createObject(1, vec3.create([5, 0, 1]), vec3.create([0, 0, 0]), vec3.create([-1, 0, 2]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.1, 0.3, 0.7])),
+        createObject(1, vec3.create([-4, 0, -1]), vec3.create([0, 0, 0]), vec3.create([2, -6, 3]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.1, 0.5, 0.9])),
+        createObject(1, vec3.create([-2, 0, 5]), vec3.create([0, 0, 0]), vec3.create([1, 3, -1]), vec3.create([0.1, 0.3, 0.8]), vec3.create([0.6, 0.3, 0.8])),
+        createObject(1, vec3.create([-1, 0, -3]), vec3.create([0, 0, 0]), vec3.create([-1, -1, 3]), vec3.create([0.1, 0.8, 0.3]), vec3.create([0.8, 0.1, 0.1])),
+        createObject(1, vec3.create([3, 0, 7]), vec3.create([0, 0, 0]), vec3.create([4, 3, -2]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.9, 0.1, 0.5])),
+        createObject(1, vec3.create([6, 0, -8]), vec3.create([0, 0, 0]), vec3.create([-3, -4, 1]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.3, 0.7, 0.1])),
+        createObject(1, vec3.create([5, 0, 1]), vec3.create([0, 0, 0]), vec3.create([-1, 5, 2]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.1, 0.3, 0.7])),
         createObject(10, vec3.create([0, -1, 0]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.0, 1.0, 0.0])),
-        createObject(50, vec3.create([-20, 0, -20]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.0, 1.0, 0.0])),
+        createObject(50, vec3.create([-20, -1, -20]), vec3.create([-90, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.0, 1.0, 0.0])),
     ];
 
     //declare a 6*6 2d array
@@ -154,46 +154,6 @@
             collision_status[i][j] = 0;
         }
     }
-
-    const obj_scale = [];
-    obj_scale.push(10.0); //tomcat
-    obj_scale.push(100.0); //csie
-    obj_scale.push(20.0); //kangaroo
-    obj_scale.push(1.0); //teapot
-    obj_scale.push(30.0); //car
-    obj_scale.push(0.5); //church
-    //translate array
-    const obj_translate = []
-    obj_translate.push(vec3.create([50,0,0])); //tomcat
-    obj_translate.push(vec3.create([0,0,0])); //csie
-    obj_translate.push(vec3.create([10,0,-10])); //kangaroo
-    obj_translate.push(vec3.create([-20,0,-10])); //teapot
-    obj_translate.push(vec3.create([35,0,-5])); //car
-    obj_translate.push(vec3.create([0,0,-10])); //church
-    //rotate array
-    const obj_rotate = []
-    obj_rotate.push(vec3.create([0,0,0])); //tomcat
-    obj_rotate.push(vec3.create([-90,0,0])); //csie
-    obj_rotate.push(vec3.create([0,0,0])); //kangaroo
-    obj_rotate.push(vec3.create([0,0,0])); //teapot
-    obj_rotate.push(vec3.create([-90,0,90])); //car
-    obj_rotate.push(vec3.create([0,0,0])); //church
-    //obj_angle array
-    const obj_angle = []
-    obj_angle.push(0); //tomcat
-    obj_angle.push(0); //csie
-    obj_angle.push(0); //kangaroo
-    obj_angle.push(0); //teapot
-    obj_angle.push(0); //car
-    obj_angle.push(0); //church
-    //obj_color array
-    const obj_mtl = [];
-    obj_mtl.push(vec3.create([0.1, 0.5, 0.9])); //tomcat
-    obj_mtl.push(vec3.create([0.7, 0.3, 0.1])); //csie
-    obj_mtl.push(vec3.create([0.9, 0.1, 0.5])); //kangaroo
-    obj_mtl.push(vec3.create([0.5, 0.9, 0.1])); //teapot
-    obj_mtl.push(vec3.create([0.3, 0.7, 0.1])); //car
-    obj_mtl.push(vec3.create([0.1, 0.3, 0.7])); //church
 
     var teapotAngle = 180;
     
@@ -232,7 +192,6 @@
         load_obj("plane.obj",6,1);
         load_obj("Csie.json",7,0);
         //load_obj("Mercedes.json", 0,0);
-        load_obj("Csie.json", 0);
         //load_obj("diy.json", 0);
         
         //load_obj("diy.json", 2);
@@ -245,7 +204,7 @@
         //loadCSIEbuilding();
 
         document.addEventListener('keydown', function(event) {
-            moveSpeed = 8;
+            moveSpeed = 1;
             switch(event.key) {
                 case 'w':
                     //alert("w");
@@ -279,12 +238,24 @@
                     cameraPosition[2] += moveSpeed*right[2];
                     //alert('position: '+cameraPosition+' direction: '+cameraDirection);
                     break;
-                    case 'ArrowUp': // Move up
-                        cameraPosition[1] += moveSpeed;
-                        break;
-                    case 'ArrowDown': // Move down
-                        cameraPosition[1] -= moveSpeed;
-                        break;
+                case 'ArrowUp': // Move up
+                    cameraPosition[1] += moveSpeed;
+                    break;
+                case 'ArrowDown': // Move down
+                    cameraPosition[1] -= moveSpeed;
+                    break;
+                case 'ArrowRight': //turn camera right
+                    var rotation = mat4.create();
+                    mat4.identity(rotation);
+                    mat4.rotate(rotation, -0.1, cameraUp);
+                    mat4.multiplyVec3(rotation, cameraDirection);
+                    break;
+                case 'ArrowLeft': //turn camera left
+                    var rotation = mat4.create();
+                    mat4.identity(rotation);
+                    mat4.rotate(rotation, 0.1, cameraUp);
+                    mat4.multiplyVec3(rotation, cameraDirection);
+                    break;
             }
         });
         gl.clearColor(0.1, 0.1, 0.1, ka);

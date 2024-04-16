@@ -10,23 +10,33 @@ function animate() {
             objects[i].position[0] += objects[i].velocity[0] * elapsed/1000 ;
             objects[i].position[1] += objects[i].velocity[1] * elapsed/1000 ;
             objects[i].position[2] += objects[i].velocity[2] * elapsed/1000 ;
-            if(objects[i].position[0] > 10){
-                objects[i].position[0] = 10;
+            if(objects[i].position[0] > 5){
+                objects[i].position[0] = 5;
                 objects[i].velocity[0] = -objects[i].velocity[0];
                 //alert("outofbounds");
             }
-            if(objects[i].position[0] < -10){
-                objects[i].position[0] = -10;
+            if(objects[i].position[0] < -5){
+                objects[i].position[0] = -5;
                 objects[i].velocity[0] = -objects[i].velocity[0];
                 //alert("outofbounds");
             }
-            if(objects[i].position[2] > 10){
-                objects[i].position[2] = 10;
+            if(objects[i].position[1] > 5){
+                objects[i].position[1] = 5;
+                objects[i].velocity[1] = -objects[i].velocity[1];
+                //alert("outofbounds");
+            }
+            if(objects[i].position[1] < -5){
+                objects[i].position[1] = -5;
+                objects[i].velocity[1] = -objects[i].velocity[1];
+                //alert("outofbounds");
+            }
+            if(objects[i].position[2] > 5){
+                objects[i].position[2] = 5;
                 objects[i].velocity[2] = -objects[i].velocity[2];
                 //alert("outofbounds");
             }
-            if(objects[i].position[2] < -10){
-                objects[i].position[2] = -10;
+            if(objects[i].position[2] < -5){
+                objects[i].position[2] = -5;
                 objects[i].velocity[2] = -objects[i].velocity[2];
                 //alert("outofbounds");
             }
