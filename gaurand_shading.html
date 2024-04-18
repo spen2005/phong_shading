@@ -1,0 +1,342 @@
+<html>
+
+<head>
+<title>ICG WebGL &mdash; HW1</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<script type="text/javascript" src="./js/glMatrix-0.9.5.min.js"></script>
+<script type="text/javascript" src="./js/webgl-utils.js"></script>
+<script type="text/javascript" src="./js/phong_shader.js"></script>
+<script type="text/javascript" src="./js/interactive_function.js"></script>
+<script type="text/javascript" src="./js/obj_loader.js"></script>
+<script type="text/javascript" src="./js/draw_obj.js"></script>
+<script type="text/javascript" src="./js/animation.js"></script>
+
+<script id="fragmentShader" type="fragment">
+    #extension GL_OES_standard_derivatives : enable
+    
+    precision mediump float;
+
+    varying vec4 fragcolor;
+
+    void main(void) {
+        gl_FragColor = fragcolor;
+    }
+</script>
+
+<script id="vertexShader" type="vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec3 aFrontColor;
+    attribute vec3 aVertexNormal;
+
+    uniform mat4 model;
+    uniform mat4 view;
+    uniform mat4 projection;
+
+    uniform float Ka;
+
+    uniform vec3 lightLoc;
+
+    uniform float Kd;
+    uniform float Ks;
+
+    varying vec4 fragcolor;
+	varying vec3 color;
+
+
+    void main(void) {
+        vec3 lightColor = vec3(1.0, 1.0, 1.0); // light color
+
+        vec3 aFrontColor = aFrontColor ;
+
+        // Transform VertexPosition and VertexNormal to world coordinate system
+        vec3 mvVertex = (model * vec4(aVertexPosition, 1.0)).xyz;
+        mat3 normalMVMatrix = mat3(model);
+        vec3 mvNormal = normalMVMatrix * aVertexNormal;
+        
+        // V, N, L, H
+        vec3 V = -normalize(mvVertex);
+        vec3 N = normalize(mvNormal);
+        vec3 L = normalize(lightLoc - mvVertex);
+        vec3 H = normalize(L + V);
+
+        // Ambient, diffuse and specular coef.
+        float ka = Ka;
+        float kd = Kd;
+        float ks = Ks; // specular coef.
+        float shininess = 32.0;
+        
+        vec3 ambient = ka * lightColor * aFrontColor;
+        vec3 diffuse = max(dot(L,N),0.0)*kd*lightColor * aFrontColor;
+        vec3 specular = pow(max(dot(V,L),0.0),shininess)*lightColor * aFrontColor;
+              
+        vec3 phong = ambient + diffuse + specular;
+        
+        fragcolor = vec4(phong, 1.0);
+        gl_Position = projection * view * model * vec4(aVertexPosition, 1.0);
+    }
+</script>
+
+<script type="text/javascript">
+    // common variables
+    var gl;
+    var shaderProgram;
+
+    var model = mat4.create();
+    var view  = mat4.create();
+    var projection = mat4.create();
+
+    var shadingMode = 0;
+    var gravity = 0;
+    var enable_audio = 0;
+
+    var cameraPosition = vec3.create([0, 0, 0]);
+    var cameraDirection = vec3.create([0, 0, -1]); // Initial camera direction
+    var cameraUp = vec3.create([0, 1, 0]);
+    //alert(cameraDirection);
+    //var cameraSpeed = 1; // Adjust as needed
+
+
+    //VertexPositionBuffer array
+    const VertexPositionBuffer = new Array(20);
+    //VertexNormalBuffer array
+    const VertexNormalBuffer = new Array(20);
+    //VertexFrontColorBuffer array
+    const VertexFrontColorBuffer = new Array(20);
+    //angle array
+    const angle = new Array(20);
+    //scale array
+
+    function createObject(scale, position, rotation, velocity, material , color) {
+        return {
+            scale: scale,
+            position: position,
+            rotation: rotation,
+            velocity: velocity,
+            material: material,
+            color: color
+        };
+    }
+
+    var objects = [
+        createObject(vec3.create([1, 1, 1]), vec3.create([-4, 0, -1]), vec3.create([0, 0, 0]), vec3.create([2, -6, 3]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.1, 0.5, 0.9])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([-2, 0, 5]), vec3.create([0, 0, 0]), vec3.create([1, 3, -1]), vec3.create([0.1, 0.3, 0.8]), vec3.create([0.6, 0.3, 0.8])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([-1, 0, -3]), vec3.create([0, 0, 0]), vec3.create([-1, -1, 3]), vec3.create([0.1, 0.8, 0.3]), vec3.create([0.8, 0.1, 0.1])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([3, 0, 7]), vec3.create([0, 0, 0]), vec3.create([4, 3, -2]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.9, 0.1, 0.5])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([6, 0, -8]), vec3.create([0, 0, 0]), vec3.create([-3, -4, 1]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.3, 0.7, 0.1])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([5, 0, 1]), vec3.create([0, 0, 0]), vec3.create([-1, 5, 2]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.1, 0.3, 0.7])),
+        createObject(vec3.create([10, 10, 10]), vec3.create([0, -1, 0]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.0, 1.0, 0.0])),
+        createObject(vec3.create([50, 50, 50]), vec3.create([-20, -1, -20]), vec3.create([-90, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.0, 1.0, 0.0])),
+        createObject(vec3.create([0.6, 0.6, 0.6]), vec3.create([0, 6.0, 1.7]), vec3.create([0, 180, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([1.0, 0.0, 0.0])),
+        createObject(vec3.create([2, 2, 2]), vec3.create([0, 0, 3]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.3, 0.5, 0.8])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([-5, 0, 0]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.0, 0.0, 1.0])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([10, 0, 0]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.0, 1.0, 1.0])),    
+    ];
+
+    //declare a 6*6 2d array
+    var collision_status = new Array(6);
+    for (var i = 0; i < 6; i++) {
+        collision_status[i] = new Array(6);
+    }
+    for (var i = 0; i < 6; i++) {
+        for (var j = 0; j < 6; j++) {
+            collision_status[i][j] = 0;
+        }
+    }
+
+    var teapotAngle = 180;
+    
+    var lastTime    = 0;
+    var ka = 0.1;
+    var light_locations = new Float32Array([30., 20., -25.]);
+    var num_obj = 0;
+
+    //*************************************************
+    // Initialization functions
+    //*************************************************
+    function initGL(canvas) {
+        try {
+            gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+            gl.viewportWidth  = canvas.width;
+            gl.viewportHeight = canvas.height;
+        } 
+        catch (e) {
+        }
+
+        if (!gl) {
+            alert("Could not initialise WebGL");
+        }
+    }
+
+    function webGLStart() {
+        var canvas = document.getElementById("ICG-canvas");
+        initGL(canvas);
+        initShaders();
+        load_obj("pinkball.obj", 0,1);
+        load_obj("pinkball.obj", 1,1);
+        load_obj("pinkball.obj", 2,1);
+        load_obj("pinkball.obj", 3,1);
+        load_obj("pinkball.obj", 4,1);
+        load_obj("pinkball.obj",5,1);
+        load_obj("plane.obj",6,1);
+        load_obj("Csie.json",7,0);
+        load_obj("backpack/backpack.obj", 8,1);
+        load_obj("cyborg/cyborg.obj", 9,1);
+        //load_obj("diy.json", 0);
+        
+        //load_obj("diy.json", 2);
+        //load_obj("pinkball.json", 2);
+        //load_obj("Kangaroo.json", 2);
+        //load_obj("Teapot.json", 3);
+        //load_obj("Car_road.json", 4);
+        //load_obj("Church_s.json", 5);
+        //loadTeapot();
+        //loadCSIEbuilding();
+
+        document.addEventListener('keydown', function(event) {
+            moveSpeed = 1;
+            switch(event.key) {
+                case 'w':
+                    //alert("w");
+                    //position = movespeed dot direction
+                    cameraPosition[0] += moveSpeed*cameraDirection[0];
+                    cameraPosition[1] += moveSpeed*cameraDirection[1];
+                    cameraPosition[2] += moveSpeed*cameraDirection[2];
+                    //alert('position: '+cameraPosition+'direction: '+cameraDirection);
+                    break;
+                case 's':
+                    cameraPosition[0] -= moveSpeed*cameraDirection[0];
+                    cameraPosition[1] -= moveSpeed*cameraDirection[1];
+                    cameraPosition[2] -= moveSpeed*cameraDirection[2];
+                    //alert('position: '+cameraPosition+' direction: '+cameraDirection);
+                    break;
+                case 'a':
+                    var left = vec3.create();
+                    vec3.cross(cameraDirection, cameraUp, left);
+                    vec3.normalize(left);
+                    cameraPosition[0] -= moveSpeed*left[0];
+                    cameraPosition[1] -= moveSpeed*left[1];
+                    cameraPosition[2] -= moveSpeed*left[2];
+                    //alert('position: '+cameraPosition+' direction: '+cameraDirection);
+                    break;
+                case 'd':
+                    var right = vec3.create();
+                    vec3.cross(cameraDirection, cameraUp, right);
+                    vec3.normalize(right);
+                    cameraPosition[0] += moveSpeed*right[0];
+                    cameraPosition[1] += moveSpeed*right[1];
+                    cameraPosition[2] += moveSpeed*right[2];
+                    //alert('position: '+cameraPosition+' direction: '+cameraDirection);
+                    break;
+                case 'ArrowUp': // Move up
+                    cameraPosition[1] += moveSpeed;
+                    break;
+                case 'ArrowDown': // Move down
+                    cameraPosition[1] -= moveSpeed;
+                    break;
+                case 'ArrowRight': //turn camera right
+                    var rotation = mat4.create();
+                    mat4.identity(rotation);
+                    mat4.rotate(rotation, -0.1, cameraUp);
+                    mat4.multiplyVec3(rotation, cameraDirection);
+                    break;
+                case 'ArrowLeft': //turn camera left
+                    var rotation = mat4.create();
+                    mat4.identity(rotation);
+                    mat4.rotate(rotation, 0.1, cameraUp);
+                    mat4.multiplyVec3(rotation, cameraDirection);
+                    break;
+            }
+        });
+        gl.clearColor(0.0, 0.0, 0.0, ka);
+        gl.enable(gl.DEPTH_TEST);
+
+        tick();
+    }
+
+    function gravity_on(){
+        gravity = 1;
+    }
+    function gravity_off(){
+        gravity = 0;
+    }
+    function sound_on(){
+        enable_audio = 1;
+    }
+    function sound_off(){
+        enable_audio = 0;
+    }
+
+</script>
+</head>
+
+
+
+
+
+<body onload="webGLStart();">
+    <p style="position: absolute; right: 2%; top:6%; ">
+        <canvas id="ICG-canvas" style="border: none;" width="1200" height="750" ></canvas>
+    </p>
+
+    <style>
+        body {
+            background-color: #987654; /* Wooden color */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        .button {
+            background-color: #FFD700; /* Green */
+            border: none;
+            color: black;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition-duration: 0.4s;
+            font-family: Arial, sans-serif;
+        }
+
+        .button:hover {
+            background-color: #FFD700; /* gold */
+        }
+    </style>
+
+
+
+    <p style="position: absolute; left: 1%; top: 10%; max-width: 30%; min-width: 30%; ">
+
+        </br>
+        <span style="font-size: 18px;">Ambient Light</span>
+        <table>
+            <tr>
+                <td>Ka: <input style="font-size: 18px; max-width: 70%; vertical-align: middle;" id="am_ka" type="range" autocomplete="off" value="0.1" max="1." min="0." step="0.05" oninput="update_ambient_light()"></td>
+            </tr>
+        </table>
+        </br>
+        
+        </br>
+        </br>
+        </br>
+    </p>
+
+    
+    
+    <p style="position: absolute; right: 10%; bottom: 10%; max-width: 30%; min-width: 30%; ">
+        <button class="button" onclick="gravity_on()">Gravity On</button>
+        <button class="button" onclick="gravity_off()">Gravity Off</button>
+    </p>
+    <p style="position: absolute; right: 10%; bottom: 0%; max-width: 30%; min-width: 30%; ">
+        <button class="button" onclick="sound_on()">Sound On</button>
+        <button class="button" onclick="sound_off()">Sound Off</button>
+    </p>
+
+</body>
+
+</html>

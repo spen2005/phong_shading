@@ -13,7 +13,7 @@ function draw_objects(i){
     mat4.translate(model, translateVec);
 
     //scale
-    mat4.scale(model, [objects[i].scale, objects[i].scale, objects[i].scale]);
+    mat4.scale(model, objects[i].scale);
    
     var rotateVec_init = objects[i].rotation; 
     mat4.rotate(model, degToRad(rotateVec_init[0]), [1, 0, 0]);
@@ -58,7 +58,11 @@ function draw_objects(i){
 
     // Setup ambient light and light position
     gl.uniform1f(gl.getUniformLocation(shaderProgram, "Ka"), ka);
-    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "lightLoc"), [5.0, 5.0,-5.0]);
+    //light location: (4cost,4,4sint)
+    var time_now = new Date().getTime();
+    var light_x = 4*Math.cos(time_now/1000);
+    var light_z = 4*Math.sin(time_now/1000);
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "lightLoc"), [light_x, 4.0, light_z]);
 
     //Setup material
     gl.uniform1f(gl.getUniformLocation(shaderProgram, "Kd"), objects[i].material[1]);
@@ -72,7 +76,7 @@ function draw_objects(i){
 
 function drawScene() {
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-    gl.clearColor(0.1, 0.1, 0.1, ka);
+    gl.clearColor(0.0, 0.0, 0.0, ka);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //iterate all objects
     draw_objects(0);
@@ -84,6 +88,8 @@ function drawScene() {
     //draw_objects(6);
     draw_objects(7);
     draw_objects(8);
+    draw_objects(9);
+    draw_objects(10);
     animate();
 }
 
