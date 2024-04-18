@@ -37,8 +37,10 @@ function getShader(gl, id) {
 }
 
 function initShaders() {
-    var fragmentShader = getShader(gl, "fragmentShader");
-    var vertexShader   = getShader(gl, "vertexShader");
+    if(mode==0)var fragmentShader = getShader(gl, "fragmentShader");
+    else var fragmentShader = getShader(gl, "phongfragmentShader");
+    if(mode==0)var vertexShader   = getShader(gl, "vertexShader");
+    else var vertexShader   = getShader(gl, "phongvertexShader");
 
     shaderProgram = gl.createProgram();
     gl.attachShader(shaderProgram, vertexShader);

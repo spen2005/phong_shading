@@ -12,7 +12,72 @@
 <script type="text/javascript" src="./js/draw_obj.js"></script>
 <script type="text/javascript" src="./js/animation.js"></script>
 
+<script id="fragmentShader" type="fragment">
+    #extension GL_OES_standard_derivatives : enable
+    
+    precision mediump float;
+
+    varying vec4 fragcolor;
+
+    void main(void) {
+        gl_FragColor = fragcolor;
+    }
+</script>
+
 <script id="vertexShader" type="vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec3 aFrontColor;
+    attribute vec3 aVertexNormal;
+
+    uniform mat4 model;
+    uniform mat4 view;
+    uniform mat4 projection;
+
+    uniform float Ka;
+
+    uniform vec3 lightLoc;
+
+    uniform float Kd;
+    uniform float Ks;
+
+    varying vec4 fragcolor;
+	varying vec3 color;
+
+
+    void main(void) {
+        vec3 lightColor = vec3(1.0, 1.0, 1.0); // light color
+
+        vec3 aFrontColor = aFrontColor ;
+
+        // Transform VertexPosition and VertexNormal to world coordinate system
+        vec3 mvVertex = (model * vec4(aVertexPosition, 1.0)).xyz;
+        mat3 normalMVMatrix = mat3(model);
+        vec3 mvNormal = normalMVMatrix * aVertexNormal;
+        
+        // V, N, L, H
+        vec3 V = -normalize(mvVertex);
+        vec3 N = normalize(mvNormal);
+        vec3 L = normalize(lightLoc - mvVertex);
+        vec3 H = normalize(L + V);
+
+        // Ambient, diffuse and specular coef.
+        float ka = Ka;
+        float kd = Kd;
+        float ks = Ks; // specular coef.
+        float shininess = 32.0;
+        
+        vec3 ambient = ka * lightColor * aFrontColor;
+        vec3 diffuse = max(dot(L,N),0.0)*kd*lightColor * aFrontColor;
+        vec3 specular = pow(max(dot(V,L),0.0),shininess)*lightColor * aFrontColor;
+              
+        vec3 phong = ambient + diffuse + specular;
+        
+        fragcolor = vec4(phong, 1.0);
+        gl_Position = projection * view * model * vec4(aVertexPosition, 1.0);
+    }
+</script>
+
+<script id="phongvertexShader" type="vertex">
     attribute vec3 aVertexPosition;
     attribute vec3 aVertexNormal;
     attribute vec3 aFrontColor;
@@ -34,7 +99,7 @@
     }
 </script>
 
-<script id="fragmentShader" type="fragment">
+<script id="phongfragmentShader" type="fragment">
     precision mediump float;
 
     varying vec3 fragNormal;
@@ -65,7 +130,6 @@
         gl_FragColor = vec4(result, 1.0);
     }
 </script>
-
 
 <script type="text/javascript">
     // common variables
@@ -141,6 +205,7 @@
     var light_locations = new Float32Array([30., 20., -25.]);
     var num_obj = 0;
 
+    var mode = 0;
     //*************************************************
     // Initialization functions
     //*************************************************
@@ -238,7 +303,7 @@
                     break;
             }
         });
-        gl.clearColor(0.1, 0.1, 0.1, ka);
+        gl.clearColor(0.0, 0.0, 0.0, ka);
         gl.enable(gl.DEPTH_TEST);
 
         tick();
@@ -257,6 +322,14 @@
         enable_audio = 0;
     }
 
+    function gaurand_mode(){
+        mode = 0;
+        initShaders();
+    }
+    function phong_mode(){
+        mode = 1;
+        initShaders();
+    }
 </script>
 </head>
 
@@ -316,7 +389,12 @@
         </br>
     </p>
 
-    
+    //switch between gaurand and phong
+
+    <p style="position: absolute; left: 1%; top: 50%; max-width: 30%; min-width: 30%; ">
+        <button class="button" onclick="gaurand_mode()">Gaurand Shading</button>
+        <button class="button" onclick="phong_mode()">Phong Shading</button>
+    </p>
     
     <p style="position: absolute; right: 10%; bottom: 10%; max-width: 30%; min-width: 30%; ">
         <button class="button" onclick="gravity_on()">Gravity On</button>
