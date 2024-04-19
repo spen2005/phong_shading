@@ -108,12 +108,20 @@
 
     uniform vec3 lightLoc;
     uniform vec3 lightColor;
+    uniform float Ka;
+    uniform vec3 illumination;
 
     void main(void) {
 
+        if(illumination[0]>0.0 || illumination[1]>0.0 || illumination[2]>0.0){
+            gl_FragColor = vec4(illumination, 1.0);
+            return;
+        }
+
         vec3 lightColor = vec3(1.0, 1.0, 1.0);
 
-        vec3 ambient = 0.1 * lightColor * fragFrontColor;
+        float ka = Ka;
+        vec3 ambient = ka * lightColor * fragFrontColor;
 
         vec3 normal = normalize(fragNormal);
         vec3 lightDir = normalize(lightLoc - fragVertex);
@@ -161,30 +169,31 @@
     const angle = new Array(20);
     //scale array
 
-    function createObject(scale, position, rotation, velocity, material , color) {
+    function createObject(scale, position, rotation, velocity, material, illumination, color) {
         return {
             scale: scale,
             position: position,
             rotation: rotation,
             velocity: velocity,
             material: material,
+            illumination: illumination,
             color: color
         };
     }
 
     var objects = [
-        createObject(vec3.create([1, 1, 1]), vec3.create([-4, 0, -1]), vec3.create([0, 0, 0]), vec3.create([2, -6, 3]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.1, 0.5, 0.9])),
-        createObject(vec3.create([1, 1, 1]), vec3.create([-2, 0, 5]), vec3.create([0, 0, 0]), vec3.create([1, 3, -1]), vec3.create([0.1, 0.3, 0.8]), vec3.create([0.6, 0.3, 0.8])),
-        createObject(vec3.create([1, 1, 1]), vec3.create([-1, 0, -3]), vec3.create([0, 0, 0]), vec3.create([-1, -1, 3]), vec3.create([0.1, 0.8, 0.3]), vec3.create([0.8, 0.1, 0.1])),
-        createObject(vec3.create([1, 1, 1]), vec3.create([3, 0, 7]), vec3.create([0, 0, 0]), vec3.create([4, 3, -2]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.9, 0.1, 0.5])),
-        createObject(vec3.create([1, 1, 1]), vec3.create([6, 0, -8]), vec3.create([0, 0, 0]), vec3.create([-3, -4, 1]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.3, 0.7, 0.1])),
-        createObject(vec3.create([1, 1, 1]), vec3.create([5, 0, 1]), vec3.create([0, 0, 0]), vec3.create([-1, 5, 2]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.1, 0.3, 0.7])),
-        createObject(vec3.create([10, 10, 10]), vec3.create([0, -1, 0]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.0, 1.0, 0.0])),
-        createObject(vec3.create([50, 50, 50]), vec3.create([-20, -1, -20]), vec3.create([-90, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.0, 1.0, 0.0])),
-        createObject(vec3.create([0.6, 0.6, 0.6]), vec3.create([0, 6.0, 1.7]), vec3.create([0, 180, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([1.0, 0.0, 0.0])),
-        createObject(vec3.create([2, 2, 2]), vec3.create([0, 0, 3]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.3, 0.5, 0.8])),
-        createObject(vec3.create([1, 1, 1]), vec3.create([-5, 0, 0]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.0, 0.0, 1.0])),
-        createObject(vec3.create([1, 1, 1]), vec3.create([10, 0, 0]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0.0, 1.0, 1.0])),    
+        createObject(vec3.create([1, 1, 1]), vec3.create([-4, 0, -1]), vec3.create([0, 0, 0]), vec3.create([2, -6, 3]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0, 0, 0]), vec3.create([0.1, 0.5, 0.9])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([-2, 0, 5]), vec3.create([0, 0, 0]), vec3.create([1, 3, -1]), vec3.create([0.1, 0.3, 0.8]), vec3.create([0, 0, 0]), vec3.create([0.6, 0.3, 0.8])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([-1, 0, -3]), vec3.create([0, 0, 0]), vec3.create([-1, -1, 3]), vec3.create([0.1, 0.8, 0.3]), vec3.create([0, 0, 0]), vec3.create([0.8, 0.1, 0.1])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([3, 0, 7]), vec3.create([0, 0, 0]), vec3.create([4, 3, -2]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0, 0, 0]), vec3.create([0.9, 0.1, 0.5])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([6, 0, -8]), vec3.create([0, 0, 0]), vec3.create([-3, -4, 1]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0, 0, 0]), vec3.create([0.3, 0.7, 0.1])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([5, 0, 1]), vec3.create([0, 0, 0]), vec3.create([-1, 5, 2]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0, 0, 0]), vec3.create([0.1, 0.3, 0.7])),
+        createObject(vec3.create([0.1, 0.1, 0.1]), vec3.create([0, 4, 4]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([1.0, 1.0, 0.0]), vec3.create([1, 1, 1]), vec3.create([1.0, 1.0, 1.0])),
+        createObject(vec3.create([50, 50, 50]), vec3.create([-20, -1, -20]), vec3.create([-90, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0, 0, 0]), vec3.create([0.0, 1.0, 0.0])),
+        createObject(vec3.create([0.6, 0.6, 0.6]), vec3.create([0, 6.0, 1.7]), vec3.create([0, 180, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0, 0, 0]), vec3.create([1.0, 0.0, 0.0])),
+        createObject(vec3.create([2, 2, 2]), vec3.create([0, 0, 3]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0, 0, 0]), vec3.create([0.3, 0.5, 0.8])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([-5, 0, 0]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0, 0, 0]), vec3.create([0.0, 0.0, 1.0])),
+        createObject(vec3.create([1, 1, 1]), vec3.create([10, 0, 0]), vec3.create([0, 0, 0]), vec3.create([0.0,0.0,0.0]), vec3.create([0.1, 0.5, 0.9]), vec3.create([0, 0, 0]), vec3.create([0.0, 1.0, 1.0])),    
     ];
 
     //declare a 6*6 2d array
@@ -233,7 +242,7 @@
         load_obj("pinkball.obj", 3,1);
         load_obj("pinkball.obj", 4,1);
         load_obj("pinkball.obj",5,1);
-        load_obj("plane.obj",6,1);
+        load_obj("pinkball.obj",6,1);
         load_obj("Csie.json",7,0);
         load_obj("backpack/backpack.obj", 8,1);
         load_obj("cyborg/cyborg.obj", 9,1);
@@ -330,6 +339,7 @@
         mode = 1;
         initShaders();
     }
+
 </script>
 </head>
 
@@ -389,8 +399,6 @@
         </br>
     </p>
 
-    //switch between gaurand and phong
-
     <p style="position: absolute; left: 1%; top: 50%; max-width: 30%; min-width: 30%; ">
         <button class="button" onclick="gaurand_mode()">Gaurand Shading</button>
         <button class="button" onclick="phong_mode()">Phong Shading</button>
@@ -404,7 +412,24 @@
         <button class="button" onclick="sound_on()">Sound On</button>
         <button class="button" onclick="sound_off()">Sound Off</button>
     </p>
-
+    
+    <p style="position: absolute; right: 30%; top: 80%; max-width: 30%; min-width: 30%; ">
+        <span style="font-size: 18px;">Guidance</span>
+        <table>
+            <tr>
+                <td>Forward: W</td>
+            </tr>
+            <tr>
+                <td>Backward: S</td>
+            </tr>
+            <tr>
+                <td>Left: A</td>
+            </tr>
+            <tr>
+                <td>Right: D</td>
+            </tr>
+        </table>
+    </p>
 </body>
 
 </html>

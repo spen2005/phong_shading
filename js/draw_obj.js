@@ -62,8 +62,11 @@ function draw_objects(i){
     var time_now = new Date().getTime();
     var light_x = 4*Math.cos(time_now/1000);
     var light_z = 4*Math.sin(time_now/1000);
-    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "lightLoc"), [light_x, 4.0, light_z]);
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "lightLoc"), [0.0, 4.0, 4.0]);
 
+    //Setup illumination vec3
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "illumination"), objects[i].illumination);
+    
     //Setup material
     gl.uniform1f(gl.getUniformLocation(shaderProgram, "Kd"), objects[i].material[1]);
     gl.uniform1f(gl.getUniformLocation(shaderProgram, "Ks"), objects[i].material[2]);
@@ -76,7 +79,7 @@ function draw_objects(i){
 
 function drawScene() {
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-    gl.clearColor(0.0, 0.0, 0.0, ka);
+    gl.clearColor(0.3, 0.3, 0.0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //iterate all objects
     draw_objects(0);
@@ -85,7 +88,7 @@ function drawScene() {
     draw_objects(3);
     draw_objects(4);
     draw_objects(5);
-    //draw_objects(6);
+    draw_objects(6);
     draw_objects(7);
     draw_objects(8);
     draw_objects(9);

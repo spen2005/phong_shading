@@ -59,7 +59,7 @@ function animate() {
     for (var i = 0; i < 6; i++) {
         for (var j=i+1; j<6; j++) {
             //if two ball collide ( distance < sqrt(0.75))
-            if(collision_status[i][j]==0 && Math.pow(objects[i].position[0]-objects[j].position[0],2) + Math.pow(objects[i].position[1]-objects[j].position[1],2) + Math.pow(objects[i].position[2]-objects[j].position[2],2) < 4.5){
+            if(collision_status[i][j]==0 && Math.pow(objects[i].position[0]-objects[j].position[0],2) + Math.pow(objects[i].position[1]-objects[j].position[1],2) + Math.pow(objects[i].position[2]-objects[j].position[2],2) < 5){
                 var temp = objects[i].velocity;
                 objects[i].velocity = objects[j].velocity;
                 objects[j].velocity = temp;
